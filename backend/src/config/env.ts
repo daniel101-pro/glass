@@ -8,6 +8,9 @@ const EnvSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('24h'),
   BCRYPT_ROUNDS: z.coerce.number().int().positive().default(10),
   MONGODB_URI: z.string().default('mongodb://localhost:27017/glass'),
+  GMAIL_USER: z.string().optional(),
+  GMAIL_APP_PASSWORD: z.string().optional(),
+  FROM_EMAIL: z.string().default('Glass Team <noreply@glass.com>'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

@@ -3,6 +3,9 @@ export interface User {
   email: string;
   fullName: string;
   passwordHash: string;
+  isEmailVerified: boolean;
+  verificationCode?: string;
+  verificationCodeExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }

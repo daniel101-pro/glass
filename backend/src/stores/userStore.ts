@@ -34,6 +34,9 @@ class UserStore {
       email: savedUser.email,
       fullName: savedUser.fullName,
       passwordHash: savedUser.passwordHash,
+      isEmailVerified: savedUser.isEmailVerified,
+      verificationCode: savedUser.verificationCode,
+      verificationCodeExpires: savedUser.verificationCodeExpires,
       createdAt: savedUser.createdAt,
       updatedAt: savedUser.updatedAt,
     };
@@ -51,6 +54,9 @@ class UserStore {
       email: user.email,
       fullName: user.fullName,
       passwordHash: user.passwordHash,
+      isEmailVerified: user.isEmailVerified,
+      verificationCode: user.verificationCode,
+      verificationCodeExpires: user.verificationCodeExpires,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -68,6 +74,9 @@ class UserStore {
       email: user.email,
       fullName: user.fullName,
       passwordHash: user.passwordHash,
+      isEmailVerified: user.isEmailVerified,
+      verificationCode: user.verificationCode,
+      verificationCodeExpires: user.verificationCodeExpires,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -106,6 +115,9 @@ class UserStore {
       email: user.email,
       fullName: user.fullName,
       passwordHash: user.passwordHash,
+      isEmailVerified: user.isEmailVerified,
+      verificationCode: user.verificationCode,
+      verificationCodeExpires: user.verificationCodeExpires,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
@@ -120,6 +132,39 @@ class UserStore {
   }
 
   /**
+   * Update verification code for user
+   */
+  async updateVerificationCode(userId: string, code: string, expires: Date): Promise<boolean> {
+    const result = await UserModel.updateOne(
+      { id: userId },
+      { 
+        verificationCode: code,
+        verificationCodeExpires: expires,
+        updatedAt: new Date()
+      }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  /**
+   * Mark user email as verified
+   */
+  async markEmailAsVerified(userId: string): Promise<boolean> {
+    const result = await UserModel.updateOne(
+      { id: userId },
+      { 
+        isEmailVerified: true,
+        $unset: { 
+          verificationCode: "",
+          verificationCodeExpires: ""
+        },
+        updatedAt: new Date()
+      }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  /**
    * Get all users (for admin purposes)
    */
   async getAllUsers(): Promise<User[]> {
@@ -129,6 +174,9 @@ class UserStore {
       email: user.email,
       fullName: user.fullName,
       passwordHash: user.passwordHash,
+      isEmailVerified: user.isEmailVerified,
+      verificationCode: user.verificationCode,
+      verificationCodeExpires: user.verificationCodeExpires,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     }));

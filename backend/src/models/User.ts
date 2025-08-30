@@ -6,6 +6,9 @@ export interface UserDocument extends Document {
   email: string;
   fullName: string;
   passwordHash: string;
+  isEmailVerified: boolean;
+  verificationCode?: string;
+  verificationCodeExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +34,18 @@ const userSchema = new Schema<UserDocument>({
   passwordHash: {
     type: String,
     required: true,
+  },
+  isEmailVerified: {
+    type: Boolean,
+    default: false,
+  },
+  verificationCode: {
+    type: String,
+    sparse: true,
+  },
+  verificationCodeExpires: {
+    type: Date,
+    sparse: true,
   },
 }, {
   timestamps: true, // This adds createdAt and updatedAt automatically
