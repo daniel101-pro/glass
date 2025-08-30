@@ -1,0 +1,2 @@
+Server listening on port 4000
+[0mGET /api/v1/health [32m200[0m 2.875 ms - 15[0m
