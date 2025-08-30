@@ -63,6 +63,13 @@ class UserStore {
   }
 
   /**
+   * Get user by ID (alias for findById)
+   */
+  async getUserById(userId: string): Promise<User | null> {
+    return this.findById(userId);
+  }
+
+  /**
    * Find user by email
    */
   async findByEmail(email: string): Promise<User | null> {

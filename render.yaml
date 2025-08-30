@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: glass-backend
+    env: node
+    region: oregon
+    plan: free
+    root: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+      - key: BCRYPT_ROUNDS
+        value: 10
+      - key: MONGODB_URI
+        sync: false # This will be set manually in Render dashboard
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: GMAIL_USER
+        sync: false # Set manually in Render dashboard
+      - key: GMAIL_APP_PASSWORD
+        sync: false # Set manually in Render dashboard
+      - key: FROM_EMAIL
+        value: "Glass Team <noreply@glass.com>"
