@@ -36,8 +36,6 @@ const userSchema = new Schema<UserDocument>({
   timestamps: true, // This adds createdAt and updatedAt automatically
 });
 
-// Create indexes for better performance
-userSchema.index({ email: 1 });
-userSchema.index({ id: 1 });
+// Indexes are already created by the unique: true property above
 
 export const User = mongoose.model<UserDocument>('User', userSchema);
