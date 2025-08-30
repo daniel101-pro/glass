@@ -4,8 +4,8 @@ export interface User {
   fullName: string;
   passwordHash: string;
   isEmailVerified: boolean;
-  verificationCode?: string;
-  verificationCodeExpires?: Date;
+  verificationCode?: string | undefined;
+  verificationCodeExpires?: Date | undefined;
   createdAt: Date;
   updatedAt: Date;
 }
