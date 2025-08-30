@@ -20,3 +20,4 @@ export function getVerificationCodeExpiry(): Date {
 export function isVerificationCodeExpired(expiryDate: Date): boolean {
   return new Date() > expiryDate;
 }
+

@@ -291,5 +291,26 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * GET /auth/verify
+ * Verify if the current token is valid and return user info
+ */
+router.get('/verify', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
+    
+    const user = await userStore.getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Return user info (excluding sensitive data)
+    res.json(AuthUtils.toUserResponse(user));
+  } catch (error) {
+    console.error('Auth verification error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export { router as authRouter };
 

@@ -28,3 +28,4 @@ process.on('SIGINT', async () => {
   console.log('MongoDB connection closed through app termination');
   process.exit(0);
 });
+
