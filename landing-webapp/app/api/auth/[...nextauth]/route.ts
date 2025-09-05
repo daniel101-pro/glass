@@ -30,6 +30,13 @@ export const authOptions: NextAuthOptions = {
         session.provider = token.provider as string
       }
       return session
+    },
+    async redirect({ url, baseUrl }) {
+      // Always redirect to dashboard after successful Google auth
+      if (url.startsWith('/')) return `${baseUrl}/dashboard`
+      // If it's a callback from Google, redirect to dashboard
+      if (url.includes('callbackUrl')) return `${baseUrl}/dashboard`
+      return `${baseUrl}/dashboard`
     }
   },
   pages: {

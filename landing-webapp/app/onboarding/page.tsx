@@ -8,8 +8,11 @@ import Image from 'next/image';
 import { gsap } from 'gsap';
 import SplitText from '../TextAnimations/SplitText/SplitText';
 import { apiClient } from '../utils/api';
-import type { SignupData } from '../utils/api';
+import type { SignupData, LoginData } from '../utils/api';
 import GlassConfetti from '../components/GlassConfetti/GlassConfetti';
+import dynamic from 'next/dynamic';
+
+const GlassLoader = dynamic(() => import('../components/GlassLoader/GlassLoader'), { ssr: false });
 
 
 export default function OnboardingPage() {
@@ -75,6 +78,50 @@ export default function OnboardingPage() {
           );
         }
       });
+    }
+  };
+
+  const handleGoToLogin = () => {
+    if (contentRef.current) {
+      gsap.to(contentRef.current, {
+        opacity: 0,
+        y: -30,
+        duration: 0.4,
+        ease: "power2.out",
+        onComplete: () => {
+          setCurrentView('login');
+          setError(null);
+          gsap.fromTo(contentRef.current, 
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
+          );
+        }
+      });
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    try {
+      const credentials: LoginData = {
+        email: formData.email.trim(),
+        password: formData.password,
+      };
+      if (!credentials.email) throw new Error('Email is required');
+      if (!credentials.password) throw new Error('Password is required');
+
+      const response = await apiClient.login(credentials);
+      if (response.tokens?.accessToken) {
+        localStorage.setItem('glass_access_token', response.tokens.accessToken);
+      }
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -225,7 +272,7 @@ export default function OnboardingPage() {
       
       // Store auth token
       if (response.tokens && response.tokens.accessToken) {
-        localStorage.setItem('authToken', response.tokens.accessToken);
+        localStorage.setItem('glass_access_token', response.tokens.accessToken);
       }
       
       // Store user info for verification screen
@@ -311,31 +358,8 @@ export default function OnboardingPage() {
 
   return (
     <div className={`min-h-screen ${colors.custom['Blue-dark-bg']} relative overflow-hidden`}>
-      {/* Glass Mouse Follower */}
-      <div 
-        ref={mouseFollowerRef}
-        className="fixed w-40 h-40 pointer-events-none z-50 flex items-center justify-center"
-        style={{
-          background: 'transparent',
-          borderRadius: '50%',
-          backdropFilter: 'blur(1px)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          transform: 'translate(-50%, -50%)'
-        }}
-      >
-        {/* Inner completely clear circle - completely isolated from parent blur */}
-        <div 
-          className="w-24 h-24 rounded-full relative"
-          style={{
-            background: 'transparent',
-            backdropFilter: 'none',
-            border: '1px solid rgba(255,255,255,0.05)',
-            isolation: 'isolate',
-            filter: 'none',
-            zIndex: 1
-          }}
-        />
-      </div>
+      {/* Glass Mouse Follower (disabled to avoid blurring text) */}
+      {/* Intentionally hidden for clarity on this page */}
 
       {/* Top Left Cloud */}
       <div 
@@ -373,8 +397,8 @@ export default function OnboardingPage() {
         />
       </div>
 
-      {/* Blur Layer */}
-      <div className="absolute inset-0 backdrop-blur-[5px] bg-white/10"></div>
+      {/* Background overlay without blur to keep text crisp */}
+      <div className="absolute inset-0 pointer-events-none"></div>
 
       {/* Content can go here */}
       <div ref={contentRef} className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4">
@@ -523,10 +547,18 @@ export default function OnboardingPage() {
               </button>
             </div>
 
-            {/* Terms */}
-            <p className="text-xs text-white/60 text-center max-w-sm mt-6">
+            {/* Terms and Login Link */}
+            <div className="text-center max-w-sm mt-6 space-y-2">
+              <p className="text-xs text-white/60">
               By continuing, you agree to our Terms of Service and Privacy Policy
             </p>
+              <button
+                onClick={handleGoToLogin}
+                className="text-xs text-white/80 hover:text-white underline"
+              >
+                Already in the clear? Login →
+              </button>
+            </div>
           </>
         ) : currentView === 'email-form' ? (
           // Email Form Content
@@ -738,11 +770,97 @@ export default function OnboardingPage() {
               </button>
             </div>
           </>
+        ) : currentView === 'login' ? (
+          // Login Form
+          <>
+            {/* Back Button */}
+            <button
+              onClick={handleBackToSignup}
+              className="absolute top-8 left-8 text-white/70 hover:text-white transition-colors text-sm"
+            >
+              ← Back
+            </button>
+
+            {/* Login Heading */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl md:text-5xl font-bold leading-tight tracking-tighter mb-4">
+                <span className="text-white">Welcome </span>
+                <span style={{ color: '#C0DDEF' }}>back.</span>
+              </h1>
+              <p className="text-lg text-white/80 max-w-md">
+                Sign in to continue to your dashboard
+              </p>
+            </div>
+
+            {/* Login Form */}
+            <form onSubmit={handleLogin} className="w-full max-w-md space-y-6">
+              {/* Error Message */}
+              {error && (
+                <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              {/* Email Address */}
+              <div>
+                <label className="block text-white/90 text-sm font-medium mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={handleInputChange('email')}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300 disabled:opacity-50"
+                />
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="block text-white/90 text-sm font-medium mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="••••••••••••••••••••"
+                  value={formData.password}
+                  onChange={handleInputChange('password')}
+                  disabled={isLoading}
+                  className="w-full px-4 py-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-300 disabled:opacity-50"
+                />
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full px-6 py-3 text-white font-medium text-[16px] tracking-tight hover:scale-105 transition-all duration-300 relative mt-4 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                style={{
+                  backgroundImage: 'url(/assets/images/button.svg)',
+                  backgroundSize: '100% 100%',
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'center'
+                }}
+              >
+                {isLoading ? 'Signing in...' : 'Login'}
+              </button>
+            </form>
+          </>
         ) : null}
       </div>
 
       {/* Glass Confetti Animation */}
       {showConfetti && <GlassConfetti />}
+
+      {/* Loading Animation */}
+      {isLoading && (
+        <GlassLoader 
+          isVisible={true} 
+          message="Signing in" 
+          submessage="Please wait while we verify your credentials" 
+        />
+      )}
     </div>
   );
 }

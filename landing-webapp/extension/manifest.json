@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Glass Overlay",
+  "version": "0.8.0",
+  "description": "Draggable Glass overlay that can show across any site.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://openrouter.ai/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Glass",
+    "default_icon": {
+      "16": "logo.svg",
+      "32": "logo.svg",
+      "48": "logo.svg"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*.svg"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
