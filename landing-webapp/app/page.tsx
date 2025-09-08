@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { gsap } from 'gsap';
 import SplitText from './TextAnimations/SplitText/SplitText';
+import Navigation from './components/Navigation';
 
 export default function Home() {
   const router = useRouter();
@@ -89,6 +90,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Navigation */}
+      <Navigation />
+      
       {/* Glass Mouse Follower */}
       <div 
         ref={mouseFollowerRef}

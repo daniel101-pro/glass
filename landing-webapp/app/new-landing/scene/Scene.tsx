@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { useMemo, useRef } from 'react';
 
 function GlassOrb({ position = [0,0,0], hue = 0.6 }) {
-  const mesh = useRef<any>();
+  const mesh = useRef<any>(null);
   useFrame(({ clock }) => {
     if (!mesh.current) return;
     const t = clock.getElapsedTime();

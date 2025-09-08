@@ -358,8 +358,31 @@ export default function OnboardingPage() {
 
   return (
     <div className={`min-h-screen ${colors.custom['Blue-dark-bg']} relative overflow-hidden`}>
-      {/* Glass Mouse Follower (disabled to avoid blurring text) */}
-      {/* Intentionally hidden for clarity on this page */}
+      {/* Glass Mouse Follower */}
+      <div 
+        ref={mouseFollowerRef}
+        className="fixed w-40 h-40 pointer-events-none z-50 flex items-center justify-center"
+        style={{
+          background: 'transparent',
+          borderRadius: '50%',
+          backdropFilter: 'blur(1px)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          transform: 'translate(-50%, -50%)'
+        }}
+      >
+        {/* Inner completely clear circle - completely isolated from parent blur */}
+        <div 
+          className="w-24 h-24 rounded-full relative"
+          style={{
+            background: 'transparent',
+            backdropFilter: 'none',
+            border: '1px solid rgba(255,255,255,0.05)',
+            isolation: 'isolate',
+            filter: 'none',
+            zIndex: 1
+          }}
+        />
+      </div>
 
       {/* Top Left Cloud */}
       <div 
@@ -397,8 +420,8 @@ export default function OnboardingPage() {
         />
       </div>
 
-      {/* Background overlay without blur to keep text crisp */}
-      <div className="absolute inset-0 pointer-events-none"></div>
+      {/* Blur Layer */}
+      <div className="absolute inset-0 backdrop-blur-[5px] bg-white/10"></div>
 
       {/* Content can go here */}
       <div ref={contentRef} className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4">
