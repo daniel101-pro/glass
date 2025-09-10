@@ -15,8 +15,7 @@ const Hyperspeed = dynamic(() => import('./Hyperspeed'), {
 });
 import { Plus_Jakarta_Sans } from 'next/font/google';
 
-// React Three Fiber scene is split out so the rest of the page can stream instantly
-const Scene = dynamic(() => import('./scene/Scene').then(m => m.Scene), { ssr: false, loading: () => null });
+// Removed 3D Scene import - now using static seenow.svg image
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['400','600','700','800'], display: 'swap' });
 
 export default function NewLandingPage() {
@@ -198,10 +197,16 @@ export default function NewLandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 1, delay: 0.8, ease: 'easeOut' }}
-            className="mt-10 relative h-[420px] rounded-[22px] border border-white/20 overflow-hidden bg-white/5"
+            className="mt-10 flex justify-center"
           >
-            <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(closest-side, rgba(99,102,241,0.25), rgba(0,0,0,0) 70%)' }} />
-            <Suspense fallback={null}><Scene minimal /></Suspense>
+            <Image
+              src="/assets/images/seenow.svg"
+              alt="See through the Glass"
+              width={1600}
+              height={900}
+              className="w-full max-w-4xl h-auto"
+              priority
+            />
           </motion.div>
 
           {/* CTA */}
@@ -311,7 +316,13 @@ export default function NewLandingPage() {
           </div>
           <div className="relative h-[500px] rounded-2xl border border-white/20 overflow-hidden bg-white/5">
             <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(closest-side, rgba(99,102,241,0.25), rgba(0,0,0,0) 70%)' }} />
-            <Suspense fallback={null}><Scene minimal /></Suspense>
+            <Image
+              src="/assets/images/seenow.svg"
+              alt="Glass in action"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
       </section>
