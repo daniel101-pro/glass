@@ -2,6 +2,7 @@
 
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import Navigation from '../components/Navigation';
+import Footer from '../components/Footer';
 
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], weight: ['400','600','700','800'], display: 'swap' });
 
@@ -30,6 +31,7 @@ export default function HelpPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

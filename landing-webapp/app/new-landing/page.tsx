@@ -8,6 +8,7 @@ import SplitText from '../TextAnimations/SplitText/SplitText';
 import BlurText from '../TextAnimations/BlurText/BlurText';
 import GradientBlinds from '../Backgrounds/GradientBlinds/GradientBlinds';
 import Navigation from '../components/Navigation';
+import Footer from '../components/Footer';
 
 const Hyperspeed = dynamic(() => import('./Hyperspeed'), { 
   ssr: false,
@@ -335,6 +336,9 @@ export default function NewLandingPage() {
           <a href="/onboarding" className="inline-block mt-8 px-6 py-3 rounded-full bg-white text-black font-semibold hover:opacity-90 transition">Get Early Access</a>
         </div>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
