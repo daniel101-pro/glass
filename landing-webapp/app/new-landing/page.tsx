@@ -96,9 +96,9 @@ export default function NewLandingPage() {
             <button className="px-6 py-3 rounded-full bg-white text-black font-semibold hover:opacity-90 transition">
               Get Early Access
             </button>
-            <button className="px-6 py-3 rounded-full border border-white/30 backdrop-blur-xl bg-white/10 hover:bg-white/15 transition">
+            <a href="/learn" className="px-6 py-3 rounded-full border border-white/30 backdrop-blur-xl bg-white/10 hover:bg-white/15 transition">
               Learn more
-            </button>
+            </a>
           </motion.div>
         </div>
       </section>
