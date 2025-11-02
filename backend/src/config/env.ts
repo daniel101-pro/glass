@@ -10,7 +10,7 @@ const EnvSchema = z.object({
   MONGODB_URI: z.string().default('mongodb://localhost:27017/glass'),
   GMAIL_USER: z.string().optional(),
   GMAIL_APP_PASSWORD: z.string().optional(),
-  FROM_EMAIL: z.string().default('Glass Team <noreply@glass.com>'),
+  FROM_EMAIL: z.string().default('Glass Team <try.glass101@gmail.com>'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

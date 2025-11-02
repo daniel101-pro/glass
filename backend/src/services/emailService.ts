@@ -38,7 +38,7 @@ export class EmailService {
 
     try {
       const mailOptions = {
-        from: env.FROM_EMAIL,
+        from: 'try.glass101@gmail.com',
         to: email,
         subject: 'Verify your Glass account',
         html: this.getVerificationEmailTemplate(code, fullName),
@@ -68,7 +68,7 @@ export class EmailService {
 
     try {
       const mailOptions = {
-        from: env.FROM_EMAIL,
+        from: 'try.glass101@gmail.com',
         to: email,
         subject: 'Welcome to the Glass Waitlist! 🎉',
         html: this.getWaitlistWelcomeTemplate(email),
@@ -305,7 +305,7 @@ export class EmailService {
                         Transparent, simple, and always in focus.
                     </p>
                     <p style="margin: 8px 0 0 0; font-size: 12px; color: #999;">
-                        Questions? Contact us at <a href="mailto:hello@glass.app" class="footer-link">hello@glass.app</a>
+                        Questions? Contact us at <a href="mailto:try.glass101@gmail.com" class="footer-link">try.glass101@gmail.com</a>
                     </p>
                 </div>
             </div>
