@@ -65,6 +65,12 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response) => 
   try {
     const { id } = req.params;
 
+    if (!id) {
+      return res.status(400).json({
+        error: 'ID parameter is required',
+      });
+    }
+
     const deleted = await waitlistStore.deleteEntry(id);
 
     if (!deleted) {

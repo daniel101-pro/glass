@@ -23,7 +23,7 @@ class WaitlistStore {
     const savedEntry = await entry.save();
 
     return {
-      id: savedEntry._id.toString(),
+      id: String(savedEntry._id),
       email: savedEntry.email,
       createdAt: savedEntry.createdAt,
       updatedAt: savedEntry.updatedAt,
@@ -37,7 +37,7 @@ class WaitlistStore {
     const entries = await WaitlistModel.find({}).sort({ createdAt: -1 });
     
     return entries.map(entry => ({
-      id: entry._id.toString(),
+      id: String(entry._id),
       email: entry.email,
       createdAt: entry.createdAt,
       updatedAt: entry.updatedAt,
@@ -53,7 +53,7 @@ class WaitlistStore {
     if (!entry) return null;
 
     return {
-      id: entry._id.toString(),
+      id: String(entry._id),
       email: entry.email,
       createdAt: entry.createdAt,
       updatedAt: entry.updatedAt,
