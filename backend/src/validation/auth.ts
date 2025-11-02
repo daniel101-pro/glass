@@ -18,6 +18,8 @@ export const signupValidation = [
     .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
   
   body('confirmPassword')
+    .notEmpty()
+    .withMessage('Password confirmation is required')
     .custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error('Password confirmation does not match password');
