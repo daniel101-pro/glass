@@ -1,7 +1,29 @@
-import { type JSX } from "react";
+import { useState, type JSX } from "react";
 import { Button } from "../../components/ui/button";
+import { VideoModal } from "../../components/VideoModal";
+
+// Random demo videos - you can replace these with your actual demo videos
+const DEMO_VIDEOS = [
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+];
+
+const getRandomVideo = (): string => {
+  return DEMO_VIDEOS[Math.floor(Math.random() * DEMO_VIDEOS.length)];
+};
 
 export const MainContentSection = (): JSX.Element => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<string>(DEMO_VIDEOS[0]);
+
+  const handleWatchDemo = () => {
+    setSelectedVideo(getRandomVideo());
+    setIsModalOpen(true);
+  };
+
   return (
     <section className="relative w-full min-h-screen bg-[#85b5d9]">
       {/* background element omitted for brevity */}
@@ -40,7 +62,10 @@ export const MainContentSection = (): JSX.Element => {
       </span>
     </Button>
 
-    <Button className="flex justify-center items-center px-[20px] py-[10px] gap-[10px] w-[156px] h-[44px] bg-[#C1DAEE] border border-solid border-[#C0DDEF] rounded-[41px] hover:bg-[#B5D1E8] transition-colors">
+    <Button 
+      onClick={handleWatchDemo}
+      className="flex justify-center items-center px-[20px] py-[10px] gap-[10px] w-[156px] h-[44px] bg-[#C1DAEE] border border-solid border-[#C0DDEF] rounded-[41px] hover:bg-[#B5D1E8] transition-colors"
+    >
       <span className="w-[116px] h-[24px] font-['Instrument_Sans'] font-medium text-[20px] leading-[24px] text-center text-[#85B5D9]">
         Watch Demo
       </span>
@@ -70,7 +95,10 @@ export const MainContentSection = (): JSX.Element => {
       </span>
     </Button>
 
-    <Button className="px-[20px] py-[12px] bg-[#C1DAEE] border border-solid border-[#C0DDEF] rounded-[41px] hover:bg-[#B5D1E8] transition-colors w-full sm:w-auto">
+    <Button 
+      onClick={handleWatchDemo}
+      className="px-[20px] py-[12px] bg-[#C1DAEE] border border-solid border-[#C0DDEF] rounded-[41px] hover:bg-[#B5D1E8] transition-colors w-full sm:w-auto"
+    >
       <span className="font-['Instrument_Sans'] font-medium text-[16px] sm:text-[18px] text-[#85B5D9]">
         Watch Demo
       </span>
@@ -94,6 +122,13 @@ export const MainContentSection = (): JSX.Element => {
           />
         </div>
       </div>
+
+      {/* Video Modal */}
+      <VideoModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        videoUrl={selectedVideo}
+      />
     </section>
   );
 };
