@@ -14,7 +14,7 @@ export const WaitlistPage = (): JSX.Element => {
     setIsLoading(true);
     setError(null);
     
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://glass-qpbx.onrender.com';
     
     try {
       const response = await fetch(`${API_URL}/api/v1/waitlist`, {

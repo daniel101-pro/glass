@@ -5,7 +5,8 @@ import { Download, Trash2, ArrowLeft, RefreshCw } from "lucide-react";
 interface WaitlistEntry {
   id: string;
   email: string;
-  timestamp: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 export const AdminPage = (): JSX.Element => {
@@ -16,7 +17,7 @@ export const AdminPage = (): JSX.Element => {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+  const API_URL = import.meta.env.VITE_API_URL || 'https://glass-qpbx.onrender.com';
 
   useEffect(() => {
     // Check if already authenticated (simple localStorage check)
@@ -323,7 +324,7 @@ export const AdminPage = (): JSX.Element => {
                           {entry.email}
                         </td>
                         <td className="px-6 py-4 font-['Instrument_Sans'] text-[#c0ddef]">
-                          {new Date(entry.timestamp).toLocaleString()}
+                          {new Date(entry.createdAt).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <Button
