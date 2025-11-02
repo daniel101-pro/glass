@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import { waitlistStore } from '../stores/waitlistStore.js';
 import { addToWaitlistValidation } from '../validation/waitlist.js';
 import { validateRequest, authenticateToken } from '../middleware/auth.js';
+import { EmailService } from '../services/emailService.js';
 
 const router = Router();
 
@@ -15,6 +16,12 @@ router.post('/', addToWaitlistValidation, validateRequest, async (req: Request, 
     const { email } = req.body;
 
     const entry = await waitlistStore.addEmail({ email });
+
+    // Send welcome email (don't fail if email sending fails)
+    EmailService.sendWaitlistWelcome(email).catch((err) => {
+      console.error('Failed to send waitlist welcome email:', err);
+      // Continue execution - email failure shouldn't break the signup
+    });
 
     res.status(201).json({
       message: 'Successfully added to waitlist',
