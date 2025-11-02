@@ -16,20 +16,29 @@ const createTransporter = () => {
   }
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
     auth: {
       user: env.GMAIL_USER,
       pass: env.GMAIL_APP_PASSWORD,
     },
+    tls: {
+      rejectUnauthorized: false, // For development/testing
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
+    requireTLS: true,
   });
 
-  // Verify connection
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error('❌ Gmail transporter verification failed:', error);
-    } else {
-      console.log('✅ Gmail transporter verified and ready to send emails');
-    }
+  // Verify connection (async for better error handling)
+  transporter.verify().then(() => {
+    console.log('✅ Gmail transporter verified and ready to send emails');
+  }).catch((error) => {
+    console.error('❌ Gmail transporter verification failed:', error);
+    console.error('Error code:', (error as any).code);
+    console.error('Error command:', (error as any).command);
   });
 
   return transporter;
@@ -103,16 +112,17 @@ export class EmailService {
         subject: mailOptions.subject,
       });
 
-      // Add timeout wrapper
+      // Add timeout wrapper with longer timeout
       const sendEmailWithTimeout = async () => {
         return Promise.race([
           transporter.sendMail(mailOptions),
           new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Email send timeout after 30 seconds')), 30000)
+            setTimeout(() => reject(new Error('Email send timeout after 60 seconds')), 60000)
           )
         ]);
       };
 
+      console.log('⏳ Waiting for email to be sent...');
       const info = await sendEmailWithTimeout() as any;
       console.log('✅ Waitlist welcome email sent successfully!');
       console.log('📧 Email Message ID:', info.messageId);
