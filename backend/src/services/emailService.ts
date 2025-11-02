@@ -6,8 +6,8 @@ const env = getEnv();
 // Create Gmail transporter
 const createTransporter = () => {
   console.log('🔍 Checking Gmail credentials...');
-  console.log('GMAIL_USER:', env.GMAIL_USER ? '✅ Set' : '❌ Not set');
-  console.log('GMAIL_APP_PASSWORD:', env.GMAIL_APP_PASSWORD ? '✅ Set' : '❌ Not set');
+  console.log('GMAIL_USER:', env.GMAIL_USER ? `✅ Set (${env.GMAIL_USER})` : '❌ Not set');
+  console.log('GMAIL_APP_PASSWORD:', env.GMAIL_APP_PASSWORD ? '✅ Set (***hidden***)' : '❌ Not set');
   
   if (!env.GMAIL_USER || !env.GMAIL_APP_PASSWORD) {
     console.log('⚠️  Gmail credentials not configured. Email simulation mode enabled.');
@@ -15,13 +15,24 @@ const createTransporter = () => {
     return null;
   }
 
-  return nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: env.GMAIL_USER,
       pass: env.GMAIL_APP_PASSWORD,
     },
   });
+
+  // Verify connection
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error('❌ Gmail transporter verification failed:', error);
+    } else {
+      console.log('✅ Gmail transporter verified and ready to send emails');
+    }
+  });
+
+  return transporter;
 };
 
 export class EmailService {
@@ -42,8 +53,11 @@ export class EmailService {
     }
 
     try {
+      // Use the authenticated Gmail user as the sender
+      const fromAddress = env.GMAIL_USER || 'try.glass101@gmail.com';
+      
       const mailOptions = {
-        from: 'try.glass101@gmail.com',
+        from: `Glass Team <${fromAddress}>`,
         to: email,
         subject: 'Verify your Glass account',
         html: this.getVerificationEmailTemplate(code, fullName),
@@ -73,8 +87,11 @@ export class EmailService {
     }
 
     try {
+      // Use the authenticated Gmail user as the sender
+      const fromAddress = env.GMAIL_USER || 'try.glass101@gmail.com';
+      
       const mailOptions = {
-        from: 'try.glass101@gmail.com',
+        from: `Glass Team <${fromAddress}>`,
         to: email,
         subject: 'Welcome to the Glass Waitlist! 🎉',
         html: this.getWaitlistWelcomeTemplate(email),
@@ -86,10 +103,22 @@ export class EmailService {
         subject: mailOptions.subject,
       });
 
-      const info = await transporter.sendMail(mailOptions);
+      // Add timeout wrapper
+      const sendEmailWithTimeout = async () => {
+        return Promise.race([
+          transporter.sendMail(mailOptions),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Email send timeout after 30 seconds')), 30000)
+          )
+        ]);
+      };
+
+      const info = await sendEmailWithTimeout() as any;
       console.log('✅ Waitlist welcome email sent successfully!');
       console.log('📧 Email Message ID:', info.messageId);
       console.log('📧 Email Response:', info.response);
+      console.log('📧 Accepted recipients:', info.accepted);
+      console.log('📧 Rejected recipients:', info.rejected);
     } catch (error) {
       console.error('❌ Email sending failed with error:');
       console.error('Error details:', error);
