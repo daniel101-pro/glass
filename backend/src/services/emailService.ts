@@ -5,8 +5,13 @@ const env = getEnv();
 
 // Create Gmail transporter
 const createTransporter = () => {
+  console.log('🔍 Checking Gmail credentials...');
+  console.log('GMAIL_USER:', env.GMAIL_USER ? '✅ Set' : '❌ Not set');
+  console.log('GMAIL_APP_PASSWORD:', env.GMAIL_APP_PASSWORD ? '✅ Set' : '❌ Not set');
+  
   if (!env.GMAIL_USER || !env.GMAIL_APP_PASSWORD) {
     console.log('⚠️  Gmail credentials not configured. Email simulation mode enabled.');
+    console.log('💡 Set GMAIL_USER and GMAIL_APP_PASSWORD environment variables to enable emails.');
     return null;
   }
 
@@ -56,6 +61,7 @@ export class EmailService {
    * Send waitlist welcome email
    */
   static async sendWaitlistWelcome(email: string): Promise<void> {
+    console.log(`📧 Attempting to send waitlist welcome email to: ${email}`);
     const transporter = createTransporter();
 
     if (!transporter) {
@@ -74,12 +80,25 @@ export class EmailService {
         html: this.getWaitlistWelcomeTemplate(email),
       };
 
+      console.log('📤 Sending email with options:', {
+        from: mailOptions.from,
+        to: mailOptions.to,
+        subject: mailOptions.subject,
+      });
+
       const info = await transporter.sendMail(mailOptions);
-      console.log('✅ Waitlist welcome email sent:', info.messageId);
+      console.log('✅ Waitlist welcome email sent successfully!');
+      console.log('📧 Email Message ID:', info.messageId);
+      console.log('📧 Email Response:', info.response);
     } catch (error) {
-      console.error('❌ Email sending failed:', error);
+      console.error('❌ Email sending failed with error:');
+      console.error('Error details:', error);
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
       // Don't throw - we don't want email failures to break waitlist signups
-      console.warn('⚠️  Continuing despite email failure');
+      console.warn('⚠️  Continuing despite email failure - waitlist signup will still succeed');
     }
   }
 
