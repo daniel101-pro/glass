@@ -1,0 +1,106 @@
+@import "tailwindcss";
+
+/* Enhanced smooth scrolling for all scrollable elements */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Smooth scrolling with custom easing */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Account for fixed navbar */
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* CSS Variables for shadcn/ui */
+:root {
+  --primary: 0 0% 100% / 0; /* transparent */
+  --primary-foreground: 222.2 84% 4.9%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --ring: 222.2 84% 4.9%;
+}
+
+/* Custom animations */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+  animation-delay: var(--animation-delay, 0ms);
+}
+
+/* Breathing animation for clouds */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+/* Rotating animation */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-rotate {
+  animation: rotate 20s linear infinite;
+  transform-origin: center center;
+}
+
+/* Combined breathing and rotating animation */
+@keyframes breathe-rotate {
+  0% {
+    transform: scale(1) rotate(12.17deg);
+  }
+  50% {
+    transform: scale(1.05) rotate(192.17deg);
+  }
+  100% {
+    transform: scale(1) rotate(372.17deg);
+  }
+}
+
+.animate-breathe-rotate {
+  animation: breathe-rotate 20s ease-in-out infinite;
+  transform-origin: center center;
+}
