@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, type JSX } from "react";
 import { Button } from "../components/ui/button";
-import { Download, Trash2, ArrowLeft, RefreshCw, Users, TrendingUp, Mail, Calendar, BarChart3, Globe } from "lucide-react";
+import { Download, Trash2, ArrowLeft, RefreshCw, Users, TrendingUp, Mail, BarChart3, Globe } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 interface WaitlistEntry {
