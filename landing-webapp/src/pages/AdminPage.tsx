@@ -26,7 +26,6 @@ export const AdminPage = (): JSX.Element => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://glass-qpbx.onrender.com';
 
@@ -185,7 +184,6 @@ export const AdminPage = (): JSX.Element => {
 
   const fetchAnalytics = async () => {
     try {
-      setAnalyticsLoading(true);
       const token = localStorage.getItem('auth_token');
       
       const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : timeRange === '90d' ? 90 : 365;
@@ -211,8 +209,6 @@ export const AdminPage = (): JSX.Element => {
       console.error('Error fetching analytics:', err);
       // Don't set error state - just use empty data
       setAnalyticsData([]);
-    } finally {
-      setAnalyticsLoading(false);
     }
   };
 
