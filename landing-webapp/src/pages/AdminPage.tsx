@@ -25,6 +25,8 @@ export const AdminPage = (): JSX.Element => {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | 'all'>('30d');
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData[]>([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   const API_URL = import.meta.env.VITE_API_URL || 'https://glass-qpbx.onrender.com';
 
@@ -33,10 +35,17 @@ export const AdminPage = (): JSX.Element => {
     if (savedAuth === 'authenticated') {
       setIsAuthenticated(true);
       fetchEntries();
+      fetchAnalytics();
     } else {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchAnalytics();
+    }
+  }, [timeRange, isAuthenticated]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,6 +183,39 @@ export const AdminPage = (): JSX.Element => {
     }
   };
 
+  const fetchAnalytics = async () => {
+    try {
+      setAnalyticsLoading(true);
+      const token = localStorage.getItem('auth_token');
+      
+      const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : timeRange === '90d' ? 90 : 365;
+      
+      const response = await fetch(`${API_URL}/api/v1/analytics/website-visits?days=${days}`, {
+        headers: token ? {
+          'Authorization': `Bearer ${token}`
+        } : {}
+      });
+      
+      if (!response.ok) {
+        if (response.status === 401) {
+          setIsAuthenticated(false);
+          localStorage.removeItem('waitlist_admin_auth');
+          throw new Error('Authentication required');
+        }
+        throw new Error('Failed to fetch analytics');
+      }
+      
+      const data = await response.json();
+      setAnalyticsData(data.data || []);
+    } catch (err) {
+      console.error('Error fetching analytics:', err);
+      // Don't set error state - just use empty data
+      setAnalyticsData([]);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('waitlist_admin_auth');
@@ -181,6 +223,7 @@ export const AdminPage = (): JSX.Element => {
     setEmail("");
     setPassword("");
     setEntries([]);
+    setAnalyticsData([]);
   };
 
   // Calculate statistics
@@ -212,7 +255,7 @@ export const AdminPage = (): JSX.Element => {
     };
   }, [entries]);
 
-  // Generate waitlist growth chart data
+  // Combine analytics data with waitlist data
   const waitlistChartData = useMemo(() => {
     const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : timeRange === '90d' ? 90 : 365;
     const data: AnalyticsData[] = [];
@@ -226,6 +269,12 @@ export const AdminPage = (): JSX.Element => {
       entriesByDate.set(dateKey, (entriesByDate.get(dateKey) || 0) + 1);
     });
     
+    // Create a map of analytics data by formatted date for quick lookup
+    const analyticsByDate = new Map<string, { visits: number; pageViews: number }>();
+    analyticsData.forEach(item => {
+      analyticsByDate.set(item.date, { visits: item.visits, pageViews: item.pageViews });
+    });
+    
     // Generate cumulative data
     let cumulative = 0;
     for (let i = days - 1; i >= 0; i--) {
@@ -235,16 +284,21 @@ export const AdminPage = (): JSX.Element => {
       const signups = entriesByDate.get(dateKey) || 0;
       cumulative += signups;
       
+      const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      
+      // Get analytics data for this date (match by formatted date string)
+      const analytics = analyticsByDate.get(formattedDate) || { visits: 0, pageViews: 0 };
+      
       data.push({
-        date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        visits: Math.floor(Math.random() * 200) + 50, // Mock data - replace with real GA data
-        pageViews: Math.floor(Math.random() * 400) + 100, // Mock data
+        date: formattedDate,
+        visits: analytics.visits,
+        pageViews: analytics.pageViews,
         signups: cumulative,
       });
     }
     
     return data;
-  }, [entries, timeRange]);
+  }, [entries, analyticsData, timeRange]);
 
   // Generate daily signups chart
   const dailySignupsData = useMemo(() => {
@@ -418,7 +472,7 @@ export const AdminPage = (): JSX.Element => {
               <span className="text-[#c0ddef] text-sm font-medium">Est.</span>
             </div>
             <h3 className="text-3xl font-bold text-[#eef9fd] mb-1">
-              {waitlistChartData.reduce((sum, d) => sum + d.visits, 0).toLocaleString()}
+              {analyticsData.reduce((sum, d) => sum + d.visits, 0).toLocaleString()}
             </h3>
             <p className="text-[#c0ddef] text-sm">Website Visits</p>
           </div>
@@ -431,8 +485,8 @@ export const AdminPage = (): JSX.Element => {
               <span className="text-[#c0ddef] text-sm font-medium">Rate</span>
             </div>
             <h3 className="text-3xl font-bold text-[#eef9fd] mb-1">
-              {stats.totalSignups > 0 
-                ? ((stats.totalSignups / waitlistChartData.reduce((sum, d) => sum + d.visits, 0)) * 100).toFixed(1) 
+              {stats.totalSignups > 0 && analyticsData.length > 0
+                ? ((stats.totalSignups / analyticsData.reduce((sum, d) => sum + d.visits, 0)) * 100).toFixed(1) 
                 : '0'}%
             </h3>
             <p className="text-[#c0ddef] text-sm">Conversion Rate</p>
@@ -453,7 +507,7 @@ export const AdminPage = (): JSX.Element => {
               <Globe className="text-[#c0ddef]" size={24} />
             </div>
             <ResponsiveContainer width="100%" height={250}>
-              <AreaChart data={waitlistChartData}>
+              <AreaChart data={analyticsData.length > 0 ? waitlistChartData : []}>
                 <defs>
                   <linearGradient id="visitsGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#85b5d9" stopOpacity={0.3}/>

@@ -11,6 +11,8 @@ const EnvSchema = z.object({
   GMAIL_USER: z.string().optional(),
   GMAIL_APP_PASSWORD: z.string().optional(),
   FROM_EMAIL: z.string().default('Glass Team <try.glass101@gmail.com>'),
+  GA_PROPERTY_ID: z.string().optional(),
+  GA_SERVICE_ACCOUNT_KEY: z.string().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
