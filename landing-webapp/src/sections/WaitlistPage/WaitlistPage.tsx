@@ -1,6 +1,7 @@
 import { useState, type JSX } from "react";
 import { Button } from "../../components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { trackWaitlistSignup } from "../../utils/analytics";
 
 export const WaitlistPage = (): JSX.Element => {
   const [email, setEmail] = useState("");
@@ -30,6 +31,9 @@ export const WaitlistPage = (): JSX.Element => {
       if (!response.ok) {
         throw new Error(data.error || 'Failed to join waitlist');
       }
+
+      // Track analytics event
+      trackWaitlistSignup(email);
 
       setIsSubmitted(true);
     } catch (err) {
