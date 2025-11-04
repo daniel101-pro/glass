@@ -103,22 +103,23 @@ export class EmailService {
         subject: mailOptions.subject,
       });
 
-      // Add timeout wrapper
-      const sendEmailWithTimeout = async () => {
-        return Promise.race([
-          transporter.sendMail(mailOptions),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Email send timeout after 30 seconds')), 30000)
-          )
-        ]);
-      };
-
-      const info = await sendEmailWithTimeout() as any;
+      // Send email with timeout protection
+      const emailPromise = transporter.sendMail(mailOptions);
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Email send timeout after 30 seconds')), 30000)
+      );
+      
+      const info = await Promise.race([emailPromise, timeoutPromise]) as any;
+      
       console.log('✅ Waitlist welcome email sent successfully!');
       console.log('📧 Email Message ID:', info.messageId);
       console.log('📧 Email Response:', info.response);
       console.log('📧 Accepted recipients:', info.accepted);
       console.log('📧 Rejected recipients:', info.rejected);
+      
+      if (info.rejected && info.rejected.length > 0) {
+        console.warn('⚠️  Some recipients were rejected:', info.rejected);
+      }
     } catch (error) {
       console.error('❌ Email sending failed with error:');
       console.error('Error details:', error);

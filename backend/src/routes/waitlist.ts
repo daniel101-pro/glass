@@ -17,11 +17,18 @@ router.post('/', addToWaitlistValidation, validateRequest, async (req: Request, 
 
     const entry = await waitlistStore.addEmail({ email });
 
-    // Send welcome email (don't fail if email sending fails)
+    // Send welcome email asynchronously (don't block response)
+    // Fire and forget - email failure shouldn't break waitlist signup
     console.log('📧 Triggering welcome email for:', email);
-    EmailService.sendWaitlistWelcome(email).catch((err) => {
-      console.error('❌ Failed to send waitlist welcome email:', err);
-      // Continue execution - email failure shouldn't break the signup
+    setImmediate(() => {
+      EmailService.sendWaitlistWelcome(email)
+        .then(() => {
+          console.log('✅ Welcome email sent successfully for:', email);
+        })
+        .catch((err) => {
+          console.error('❌ Failed to send waitlist welcome email:', err);
+          console.error('Error stack:', err instanceof Error ? err.stack : 'No stack trace');
+        });
     });
 
     res.status(201).json({
