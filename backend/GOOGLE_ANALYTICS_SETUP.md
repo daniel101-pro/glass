@@ -45,15 +45,18 @@ The dashboard now fetches real website visit data from Google Analytics 4. Follo
 ## Step 5: Get Your Property ID
 
 1. In Google Analytics, go to **Admin**
-2. Under **Property**, click **Property Settings**
-3. Copy the **Property ID** (numeric, not the Measurement ID)
+2. Under **Property**, click **Data Streams**
+3. Click on your stream (e.g., "Glass")
+4. Copy the **Stream ID** (numeric, e.g., `12952536444`) - this is your Property ID
+   - Note: This is different from the Measurement ID (G-XXXXXXXXXX)
+   - The Stream ID is what you'll use for the API
 
 ## Step 6: Add Environment Variables
 
 Add these to your `.env` file or deployment environment:
 
 ```bash
-GA_PROPERTY_ID=123456789  # Your GA4 Property ID (numeric)
+GA_PROPERTY_ID=12952536444  # Your GA4 Stream ID / Property ID (numeric)
 GA_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"...","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"...","client_id":"...","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"..."}
 ```
 
