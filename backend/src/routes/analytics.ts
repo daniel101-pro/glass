@@ -19,6 +19,13 @@ router.get('/website-visits', authenticateToken, async (req: Request, res: Respo
     const daysBack = days ? parseInt(days as string) : 30;
     const start = startDate ? new Date(startDate as string) : new Date(end.getTime() - daysBack * 24 * 60 * 60 * 1000);
     
+    // Validate date range
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({
+        error: 'Invalid date range',
+      });
+    }
+    
     // Fetch real data from Google Analytics
     const data = await fetchWebsiteAnalytics(start, end);
     
@@ -32,8 +39,10 @@ router.get('/website-visits', authenticateToken, async (req: Request, res: Respo
     });
   } catch (error) {
     console.error('Analytics fetch error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to fetch analytics data';
     res.status(500).json({
-      error: 'Failed to fetch analytics data',
+      error: errorMessage,
+      success: false,
     });
   }
 });

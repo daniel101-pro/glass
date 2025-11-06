@@ -186,28 +186,41 @@ export const AdminPage = (): JSX.Element => {
     try {
       const token = localStorage.getItem('auth_token');
       
+      if (!token) {
+        console.warn('No auth token available for analytics');
+        setAnalyticsData([]);
+        return;
+      }
+      
       const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : timeRange === '90d' ? 90 : 365;
       
       const response = await fetch(`${API_URL}/api/v1/analytics/website-visits?days=${days}`, {
-        headers: token ? {
-          'Authorization': `Bearer ${token}`
-        } : {}
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
       
       if (!response.ok) {
         if (response.status === 401) {
           setIsAuthenticated(false);
           localStorage.removeItem('waitlist_admin_auth');
-          throw new Error('Authentication required');
+          console.error('Authentication failed for analytics');
+          setAnalyticsData([]);
+          return;
         }
-        throw new Error('Failed to fetch analytics');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Analytics API error:', response.status, errorData);
+        setAnalyticsData([]);
+        return;
       }
       
       const data = await response.json();
       setAnalyticsData(data.data || []);
     } catch (err) {
       console.error('Error fetching analytics:', err);
-      // Don't set error state - just use empty data
+      // Network error or other fetch failure - use empty data
       setAnalyticsData([]);
     }
   };
@@ -670,63 +683,63 @@ export const AdminPage = (): JSX.Element => {
             </div>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <RefreshCw size={32} className="text-[#eef9fd] animate-spin" />
-            </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <RefreshCw size={32} className="text-[#eef9fd] animate-spin" />
+          </div>
           ) : entries.length === 0 ? (
-            <div className="p-12 text-center">
-              <p className="font-['Instrument_Sans'] text-[#c0ddef] text-lg">
-                No waitlist entries yet
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-[rgba(255,255,255,0.05)]">
-                  <tr>
-                    <th className="px-6 py-4 text-left font-['Instrument_Sans'] font-semibold text-[#eef9fd]">
-                      Email
-                    </th>
-                    <th className="px-6 py-4 text-left font-['Instrument_Sans'] font-semibold text-[#eef9fd]">
-                      Date Joined
-                    </th>
-                    <th className="px-6 py-4 text-right font-['Instrument_Sans'] font-semibold text-[#eef9fd]">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entries.map((entry, index) => (
-                    <tr
-                      key={entry.id}
-                      className={`border-t border-white/10 ${
-                        index % 2 === 0 ? 'bg-[rgba(255,255,255,0.02)]' : ''
-                      }`}
-                    >
-                      <td className="px-6 py-4 font-['Instrument_Sans'] text-[#eef9fd]">
-                        {entry.email}
-                      </td>
-                      <td className="px-6 py-4 font-['Instrument_Sans'] text-[#c0ddef]">
-                        {new Date(entry.createdAt).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <Button
-                          onClick={() => handleDelete(entry.id)}
-                          variant="ghost"
-                          className="text-red-300 hover:text-red-200 hover:bg-red-500/20"
-                          size="sm"
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </td>
+              <div className="p-12 text-center">
+                <p className="font-['Instrument_Sans'] text-[#c0ddef] text-lg">
+                  No waitlist entries yet
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-[rgba(255,255,255,0.05)]">
+                    <tr>
+                      <th className="px-6 py-4 text-left font-['Instrument_Sans'] font-semibold text-[#eef9fd]">
+                        Email
+                      </th>
+                      <th className="px-6 py-4 text-left font-['Instrument_Sans'] font-semibold text-[#eef9fd]">
+                        Date Joined
+                      </th>
+                      <th className="px-6 py-4 text-right font-['Instrument_Sans'] font-semibold text-[#eef9fd]">
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                  </thead>
+                  <tbody>
+                    {entries.map((entry, index) => (
+                      <tr
+                        key={entry.id}
+                        className={`border-t border-white/10 ${
+                          index % 2 === 0 ? 'bg-[rgba(255,255,255,0.02)]' : ''
+                        }`}
+                      >
+                        <td className="px-6 py-4 font-['Instrument_Sans'] text-[#eef9fd]">
+                          {entry.email}
+                        </td>
+                        <td className="px-6 py-4 font-['Instrument_Sans'] text-[#c0ddef]">
+                        {new Date(entry.createdAt).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Button
+                            onClick={() => handleDelete(entry.id)}
+                            variant="ghost"
+                            className="text-red-300 hover:text-red-200 hover:bg-red-500/20"
+                            size="sm"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
       </div>
     </section>
   );

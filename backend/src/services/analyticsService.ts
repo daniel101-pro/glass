@@ -37,14 +37,16 @@ export async function fetchWebsiteAnalytics(
   startDate: Date,
   endDate: Date
 ): Promise<{ date: string; visits: number; pageViews: number }[]> {
+  // Return empty data if GA not configured (don't throw error)
   const client = getAnalyticsClient();
 
   if (!client) {
-    // Return empty data if GA not configured
+    console.log('📊 Google Analytics not configured - returning empty data');
     return generateEmptyData(startDate, endDate);
   }
 
   if (!env.GA_PROPERTY_ID) {
+    console.log('📊 GA_PROPERTY_ID not set - returning empty data');
     return generateEmptyData(startDate, endDate);
   }
 
