@@ -169,18 +169,13 @@ export const HeaderSection = (): JSX.Element => {
   const [activeTab, setActiveTab] = useState('deepfakes');
   const [videoTab, setVideoTab] = useState('conversations');
 
-  // YouTube video IDs for each tab (random videos)
-  const youtubeVideoIds = {
-    conversations: 'dQw4w9WgXcQ', // Sample video - replace with your choice
-    documents: 'jNQXAC9IVRw', // Sample video - replace with your choice
-    images: '9bZkp7q19f0', // Sample video - replace with your choice
-    social: 'kJQP7kiw5Fk', // Sample video - replace with your choice
-    everyday: 'fJ9rUzIMcZQ', // Sample video - replace with your choice
-  };
-
-  // Get YouTube embed URL
-  const getYouTubeEmbedUrl = (videoId: string) => {
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&mute=1&controls=1&rel=0&modestbranding=1`;
+  // Images for each tab - using video-call.png for conversations, can add more later
+  const tabImages = {
+    conversations: '/video-call.png',
+    documents: '/video-call.png', // Using same image for now, can be replaced
+    images: '/video-call.png', // Using same image for now, can be replaced
+    social: '/video-call.png', // Using same image for now, can be replaced
+    everyday: '/video-call.png', // Using same image for now, can be replaced
   };
 
   return (
@@ -231,16 +226,20 @@ export const HeaderSection = (): JSX.Element => {
               </TabsList>
             </Tabs>
 
-            <div className="relative w-full max-w-full overflow-hidden rounded-lg bg-black/10" style={{ paddingBottom: '56.25%', height: 0 }}>
-              <iframe
-                key={videoTab}
-                className="absolute top-0 left-0 w-full h-full rounded-lg"
-                src={getYouTubeEmbedUrl(youtubeVideoIds[videoTab as keyof typeof youtubeVideoIds])}
-                title="Video player"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+            {/* Glass container with image */}
+            <div className="relative w-full max-w-full overflow-hidden rounded-[34px]">
+              {/* Glass background effect */}
+              <div className="relative w-full bg-[#749fbf99] backdrop-blur-xl rounded-[34px] border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.40),inset_1px_0_0_rgba(255,255,255,0.32),inset_0_-1px_1px_rgba(0,0,0,0.13),inset_-1px_0_1px_rgba(0,0,0,0.11)] p-4 sm:p-6">
+                {/* Image container */}
+                <div className="relative w-full overflow-hidden rounded-[24px] bg-black/10" style={{ paddingBottom: '56.25%', height: 0 }}>
+                  <img
+                    key={videoTab}
+                    src={tabImages[videoTab as keyof typeof tabImages]}
+                    alt={`${videoTab} preview`}
+                    className="absolute top-0 left-0 w-full h-full object-cover rounded-[24px]"
+                  />
+                </div>
+              </div>
             </div>
 
             <Button 
