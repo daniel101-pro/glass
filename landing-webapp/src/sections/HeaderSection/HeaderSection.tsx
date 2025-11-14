@@ -171,7 +171,7 @@ export const HeaderSection = (): JSX.Element => {
 
   // Images for each tab - using video-call.png for conversations, can add more later
   const tabImages = {
-    conversations: '/video-call.png',
+    conversations: '/hero(conversation).png',
     documents: '/video-call.png', // Using same image for now, can be replaced
     images: '/video-call.png', // Using same image for now, can be replaced
     social: '/video-call.png', // Using same image for now, can be replaced
@@ -227,16 +227,16 @@ export const HeaderSection = (): JSX.Element => {
             </Tabs>
 
             {/* Glass container with image */}
-            <div className="relative w-full max-w-full overflow-hidden rounded-[34px]">
+            <div className="relative w-full max-w-[1120px] mx-auto overflow-hidden rounded-[34px]">
               {/* Glass background effect */}
               <div className="relative w-full bg-[#749fbf99] backdrop-blur-xl rounded-[34px] border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.40),inset_1px_0_0_rgba(255,255,255,0.32),inset_0_-1px_1px_rgba(0,0,0,0.13),inset_-1px_0_1px_rgba(0,0,0,0.11)] p-4 sm:p-6">
                 {/* Image container */}
-                <div className="relative w-full overflow-hidden rounded-[24px] bg-black/10" style={{ paddingBottom: '56.25%', height: 0 }}>
+                <div className="relative w-full overflow-hidden rounded-[24px]" style={{ paddingBottom: '56.25%', height: 0 }}>
                   <img
                     key={videoTab}
                     src={tabImages[videoTab as keyof typeof tabImages]}
                     alt={`${videoTab} preview`}
-                    className="absolute top-0 left-0 w-full h-full object-cover rounded-[24px]"
+                    className="absolute top-0 left-0 w-full h-full object-contain rounded-[24px] bg-transparent"
                   />
                 </div>
               </div>
